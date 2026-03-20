@@ -1,5 +1,3 @@
-print("enumerate():")
-
 a = ['apple', 'banana', 'cherry']
 for i, x in enumerate(a):
     print(f"{i}: {x}")
