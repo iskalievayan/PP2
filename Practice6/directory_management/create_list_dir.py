@@ -2,15 +2,13 @@ import os
 import sys
 from pathlib import Path
 
-# Determine base directory: first argument if provided and not starting with '-'
 if len(sys.argv) > 1 and not sys.argv[1].startswith('-'):
     base = Path(sys.argv[1])
-    dir_names = sys.argv[2:]  # remaining args are directory names
+    dir_names = sys.argv[2:]  
 else:
     base = Path.cwd()
-    dir_names = sys.argv[1:]  # if no base, all args are dir names
+    dir_names = sys.argv[1:]
 
-# If no directory names given, read from stdin (e.g., from a file)
 if not dir_names:
     dir_names = [line.strip() for line in sys.stdin if line.strip()]
 

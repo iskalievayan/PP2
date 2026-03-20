@@ -9,7 +9,7 @@ if len(sys.argv) < 3:
 
 src = Path(sys.argv[1])
 dst = Path(sys.argv[2])
-extensions = sys.argv[3:]  # optional list of extensions (e.g., .txt .jpg)
+extensions = sys.argv[3:] 
 
 if not src.is_dir():
     print(f"Source directory not found: {src}")
