@@ -251,6 +251,20 @@ def main():
             # Move coins; check collection
             for co in coins[:]:
                 co.update()
+
+                # --- магнит к игроку ---
+                px = player.x + player.W // 2
+                py = player.y + player.H // 2
+
+                dx = px - co.x
+                dy = py - co.y
+                dist = (dx**2 + dy**2) ** 0.5
+
+                if dist < 120:  # радиус "притяжения"
+                    co.x += dx * 0.05
+                    co.y += dy * 0.05
+
+                # --- обычная логика ---
                 if co.off_screen():
                     coins.remove(co)
                 elif co.rect().colliderect(player.rect()):
