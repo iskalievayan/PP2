@@ -1,84 +1,80 @@
 import pygame
-import os
+import sys
 from player import MusicPlayer
+
+
+def format_time(seconds):
+    minutes = seconds // 60
+    secs = seconds % 60
+    return f"{minutes}:{secs:02}"
 
 pygame.init()
 pygame.mixer.init()
 
-screen = pygame.display.set_mode((800, 500))
+WIDTH, HEIGHT = 700, 450
+screen = pygame.display.set_mode((WIDTH, HEIGHT))
+pygame.display.set_caption("Music Player UI")
 
-font = pygame.font.Font(None, 32)
-small_font = pygame.font.Font(None, 26)
+font = pygame.font.SysFont("Centurygothic", 28)
+small_font = pygame.font.SysFont("Centurygothic", 20)
+
+tracks = [
+    "Drake - Toosie Slide.mp3",
+    "Drake feat. Chris Brown - Not You Too.mp3",
+    "Drake feat. Travis Scott - Fair Trade.mp3",
+]
+
+player = MusicPlayer(tracks)
 
 clock = pygame.time.Clock()
 
-music_directory = "music"
-player = MusicPlayer(music_directory)
+def draw_progress_bar(x, y, w, h, progress):
+    pygame.draw.rect(screen, (255, 255, 255), (x, y, w, h),border_radius=20)
+    pygame.draw.rect(screen, (0, 150, 255), (x, y, int(w * progress), h),border_radius=20)
 
-running = True
-while running:
-
-    player.update()
-
+while True:
     for event in pygame.event.get():
-
         if event.type == pygame.QUIT:
-            running = False
+            pygame.quit()
+            sys.exit()
 
-        elif event.type == pygame.KEYDOWN:
-
-            if event.key == pygame.K_SPACE:
-                player.play_pause()
-
-            elif event.key == pygame.K_RIGHT:
-                player.next_track()
-
-            elif event.key == pygame.K_LEFT:
-                player.previous_track()
-
+        if event.type == pygame.KEYDOWN:
+            if event.key == pygame.K_p:
+                player.play()
+            elif event.key == pygame.K_s:
+                player.stop()
+            elif event.key == pygame.K_n:
+                player.next()
+            elif event.key == pygame.K_b:
+                player.prev()
             elif event.key == pygame.K_q:
-                running = False
+                pygame.quit()
+                sys.exit()
 
-    screen.fill((175, 238, 238))  #pale turquoise
+    screen.fill((10, 10, 12))
 
-    title = font.render("Music Player", True, (0, 0, 128))
-    screen.blit(title, (320, 50))
+    track_name = player.get_current_track().split("/")[-1]
+    text = font.render(f"{track_name}", True, (255, 255, 255))
+    screen.blit(text, (50, 100))
 
-    instructions = small_font.render(
-        "SPACE - Play/Pause   LEFT - Previous   RIGHT - Next   Q - Quit",
-        True,
-        (0, 0, 128)
-    )
-    screen.blit(instructions, (150, 100))
+    pos = pygame.mixer.music.get_pos() // 1000
+    time_text = font.render(format_time(pos), True, (200, 200, 200))
+    screen.blit(time_text, (50, 150))
 
-    if len(player.playlist) > 0:
+    progress = (pos % 100) / 100
+    draw_progress_bar(50, 200, 600, 20, progress)
 
-        current_text = font.render("Current track:", True, (0, 0, 128))
-        screen.blit(current_text, (50, 200))
+    controls = [
+        "P - Play",
+        "S - Stop",
+        "N - Next",
+        "B - Back",
+        "Q - Quit"
+    ]
 
-        track_text = small_font.render(player.get_current_track_name(), True, (0, 0, 0))
-        screen.blit(track_text, (50, 240))
-
-        status_text = small_font.render("Status: " + player.get_status() + "   " + player.get_position(), True, (0, 0, 128))
-        screen.blit(status_text, (50, 280))
-
-        list_title = font.render("Playlist:", True, (0, 0, 0))
-        screen.blit(list_title, (420, 200))
-
-        y = 240
-        for i in range(len(player.playlist)):
-            if i == player.current_index:
-                text = small_font.render("> " + player.playlist[i], True, (65, 105, 225))
-            else:
-                text = small_font.render(player.playlist[i], True, (0, 0, 0))
-            screen.blit(text, (420, y))
-            y += 35
-
-    else:
-        no_music = font.render("No music files found", True, (255, 0, 0))
-        screen.blit(no_music, (180, 240))
+    for i, ctrl in enumerate(controls):
+        ctrl_text = small_font.render(ctrl, True, (150, 150, 150))
+        screen.blit(ctrl_text, (50, 300 + i * 25))
 
     pygame.display.flip()
-    clock.tick(30)
-
-pygame.quit()
+    clock.tick(60)

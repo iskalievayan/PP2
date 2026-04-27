@@ -3,13 +3,13 @@ import datetime
 
 class Clock:
     def __init__(self):
-        self.face = pygame.image.load('images/mainclock.png')
+        self.face = pygame.image.load('mainclock.png')
         self.face = pygame.transform.scale(self.face, (600, 600))
 
-        self.minute_arrow = pygame.image.load('images/rightarm.png')
+        self.minute_arrow = pygame.image.load('rightarm.png')
         self.minute_arrow = pygame.transform.scale(self.minute_arrow, (800, 700))
 
-        self.second_arrow = pygame.image.load('images/leftarm.png')
+        self.second_arrow = pygame.image.load('leftarm.png')
         self.second_arrow = pygame.transform.scale(self.second_arrow, (40, 500))
 
     def draw(self, screen):
