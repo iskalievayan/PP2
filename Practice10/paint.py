@@ -112,10 +112,6 @@ class PaintApp:
             pygame.draw.circle(self.canvas, self.color, cp, self.brush_size)
         elif self.tool == ERASER:
             pygame.draw.circle(self.canvas, WHITE, cp, self.eraser_size)
-        elif self.tool in (RECTANGLE, CIRCLE):
-            # Save a snapshot of the canvas so we can overwrite it on every
-            # mouse-move to give the user a live preview.
-            self._snapshot = self.canvas.copy()
 
     # ── Drag ──────────────────────────────────────────────────────────────────
     def _on_drag(self, pos):
@@ -136,11 +132,6 @@ class PaintApp:
             pygame.draw.circle(self.canvas, WHITE, cp, self.eraser_size)
             self.prev_pos = cp
 
-        elif self.tool in (RECTANGLE, CIRCLE):
-            # Restore snapshot then draw the preview shape
-            self.canvas.blit(self._snapshot, (0, 0))
-            self._draw_shape(self.start_pos, cp, self.canvas)
-
     # ── Release ───────────────────────────────────────────────────────────────
     def _on_release(self, pos):
         if not self.drawing:
@@ -152,7 +143,6 @@ class PaintApp:
 
         if self.tool in (RECTANGLE, CIRCLE):
             # Commit final shape
-            self.canvas.blit(self._snapshot, (0, 0))
             self._draw_shape(self.start_pos, cp, self.canvas)
 
         self.drawing   = False
@@ -224,6 +214,8 @@ class PaintApp:
             cp = (mx, my - CANVAS_TOP)
             preview_surf = pygame.Surface((SCREEN_W, CANVAS_H), pygame.SRCALPHA)
             self._draw_shape(self.start_pos, cp, preview_surf)
+            
+            surface.blit(preview_surf, (0, CANVAS_TOP))
             # (shape is already on self.canvas from _on_drag; this is just a safety)
 
         # Eraser cursor ring
