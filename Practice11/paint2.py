@@ -34,13 +34,14 @@ SQUARE   = "square"          # new – axis-aligned square
 RT_TRI   = "right_tri"       # new – right-angle triangle
 EQ_TRI   = "equil_tri"       # new – equilateral triangle
 RHOMBUS  = "rhombus"         # new – rhombus (diamond)
+HEXAGON = "hexagon"
 
 # Rows of tool buttons: row 0 (original), row 1 (new shapes)
 TOOLS_ROW0 = [PENCIL, RECTANGLE, CIRCLE, ERASER]
 ICONS_ROW0 = ["✏ Pencil", "▭ Rect", "◯ Circle", "⌫ Eraser"]
 
-TOOLS_ROW1 = [SQUARE, RT_TRI, EQ_TRI, RHOMBUS]
-ICONS_ROW1 = ["■ Square", "◺ R.Tri", "△ Eq.Tri", "◇ Rhombus"]
+TOOLS_ROW1 = [SQUARE, RT_TRI, EQ_TRI, RHOMBUS, HEXAGON]
+ICONS_ROW1 = ["■ Square", "◺ R.Tri", "△ Eq.Tri", "◇ Rhombus", "6 Hexagon"]
 
 ALL_TOOLS = TOOLS_ROW0 + TOOLS_ROW1   # combined for easy lookup
 
@@ -139,6 +140,25 @@ def _rhombus_points(p1, p2):
         (x1, my),   # left
     ]
 
+def _hexagon_points(p1, p2):
+    x1, y1 = p1
+    x2, y2 = p2
+
+    cx = (x1 + x2) // 2
+    cy = (y1 + y2) // 2
+
+    w = abs(x2 - x1) // 2
+    h = abs(y2 - y1) // 2
+
+    return [
+        (cx - w//2, cy - h),   # top-left
+        (cx + w//2, cy - h),   # top-right
+        (cx + w,    cy),       # right
+        (cx + w//2, cy + h),   # bottom-right
+        (cx - w//2, cy + h),   # bottom-left
+        (cx - w,    cy),       # left
+    ]
+
 
 # ──────────────────────────────────────────────────────────────────────────────
 # Main application class
@@ -193,7 +213,7 @@ class PaintApp:
             pygame.draw.circle(self.canvas, self.color, cp, self.brush_size)
         elif self.tool == ERASER:
             pygame.draw.circle(self.canvas, WHITE, cp, self.eraser_size)
-        elif self.tool in (RECTANGLE, CIRCLE, SQUARE, RT_TRI, EQ_TRI, RHOMBUS):
+        elif self.tool in (RECTANGLE, CIRCLE, SQUARE, RT_TRI, EQ_TRI, RHOMBUS, HEXAGON):
             # Save a snapshot so we can restore the canvas each drag frame
             # (prevents ghost trails while rubber-banding shapes)
             self._snapshot = self.canvas.copy()
@@ -219,7 +239,7 @@ class PaintApp:
             pygame.draw.circle(self.canvas, WHITE, cp, self.eraser_size)
             self.prev_pos = cp
 
-        elif self.tool in (RECTANGLE, CIRCLE, SQUARE, RT_TRI, EQ_TRI, RHOMBUS):
+        elif self.tool in (RECTANGLE, CIRCLE, SQUARE, RT_TRI, EQ_TRI, RHOMBUS, HEXAGON):
             pass
 
     # ── Mouse-release ──────────────────────────────────────────────────────────
@@ -234,7 +254,7 @@ class PaintApp:
         cp = (cx, cy - CANVAS_TOP)
 
         # Commit the final shape to the canvas
-        if self.tool in (RECTANGLE, CIRCLE, SQUARE, RT_TRI, EQ_TRI, RHOMBUS):
+        if self.tool in (RECTANGLE, CIRCLE, SQUARE, RT_TRI, EQ_TRI, RHOMBUS, HEXAGON):
             self._draw_shape(self.start_pos, cp, self.canvas)
 
         self.drawing    = False
@@ -282,6 +302,10 @@ class PaintApp:
         elif self.tool == RHOMBUS:
             # Diamond whose tips touch the four edge midpoints of the bounding box
             pts = _rhombus_points(p1, p2)
+            pygame.draw.polygon(surface, col, pts, 2)
+            
+        elif self.tool == HEXAGON:
+            pts = _hexagon_points(p1, p2)
             pygame.draw.polygon(surface, col, pts, 2)
 
     # ── Toolbar click handler ──────────────────────────────────────────────────
