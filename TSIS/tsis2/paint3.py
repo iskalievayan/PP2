@@ -78,7 +78,7 @@ clock  = pygame.time.Clock()
 
 # ─────────────────────────────────────────────────────────────────────────────
 class PaintApp:
-    def _init_(self):
+    def __init__(self):
         self.canvas = pygame.Surface((SCREEN_W, CANVAS_H))
         self.canvas.fill(WHITE)
 
@@ -445,5 +445,5 @@ def main():
         pygame.display.flip()
 
 
-if _name_ == "_main_":
+if __name__ == "__main__":
     main()
