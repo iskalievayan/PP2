@@ -5,8 +5,8 @@ from datetime import datetime
 DB_CONFIG = {
     "host":     "localhost",
     "database": "snake",
-    "user":     "rakhatmaksat",
-    "password": "",
+    "user":     "postgres",
+    "password": "1234",
 }
 
 def get_connection():
