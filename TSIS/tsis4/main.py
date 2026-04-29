@@ -163,6 +163,7 @@ def screen_gameplay(username, settings):
         for event in pygame.event.get():
             if event.type == QUIT:
                 pygame.quit(); sys.exit()
+            
 
             if event.type == KEYDOWN:
 
@@ -185,6 +186,10 @@ def screen_gameplay(username, settings):
                                                score=pending_score,
                                                settings=settings)
                         phase = "playing"
+                
+                elif phase == "win":
+                    if event.key == K_RETURN:
+                        return ("menu",)
 
         # автопереход с экрана level_clear
         if phase == "level_clear" and time.time() >= clear_deadline:
@@ -250,16 +255,12 @@ def screen_gameplay(username, settings):
 
         elif phase == "game_over_anim":
             return ("game_over", state["score"], state["level"])
-
+        
         elif phase == "win":
             draw_overlay(screen,
                 ["YOU WON!", f"Score: {state['score']}", "ENTER — menu"],
                 [GOLD, WHITE, LIGHT_GRAY])
-            for event in pygame.event.get():
-                if event.type == QUIT:
-                    pygame.quit(); sys.exit()
-                if event.type == KEYDOWN and event.key == K_RETURN:
-                    return ("menu",)
+
 
         pygame.display.flip()
         clock.tick(state["fps"])
